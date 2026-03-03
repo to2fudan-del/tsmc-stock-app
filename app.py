@@ -3,56 +3,53 @@ import yfinance as yf
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
 
-# 設定網頁標題
-st.set_page_config(page_title=台積電股價分析儀表板, layout=wide)
+# Set page config
+st.set_page_config(page_title="TSMC Stock Dashboard", layout="wide")
 
-st.title("台積電 (2330.TW) 股價即時畫布")
-st.sidebar.header(查詢參數設定)
+st.title("TSMC (2330.TW) Stock Price Analysis")
+st.sidebar.header("Settings")
 
-# 1. 讓使用者在側邊欄輸入日期
-start_date = st.sidebar.date_input(開始日期, datetime.now() - timedelta(days=365))
-end_date = st.sidebar.date_input(結束日期, datetime.now())
+# 1. Date input
+start_date = st.sidebar.date_input("Start Date", datetime.now() - timedelta(days=365))
+end_date = st.sidebar.date_input("End Date", datetime.now())
 
-if start_date  end_date
-    st.sidebar.error(錯誤：開始日期不能晚於結束日期)
-else
-    # 2. 抓取資料
-    ticker = 2330.TW
+if start_date > end_date:
+    st.sidebar.error("Error: Start date must be before end date")
+else:
+    # 2. Fetch data
+    ticker = "2330.TW"
     df = yf.download(ticker, start=start_date, end=end_date)
 
-    if not df.empty
-        # 3. 建立 Plotly K線圖
+    if not df.empty:
+        # 3. Create Plotly Chart
         fig = go.Figure(data=[go.Candlestick(
             x=df.index,
             open=df['Open'],
             high=df['High'],
             low=df['Low'],
             close=df['Close'],
-            name='K線',
-            increasing_line_color='red',  # 台股紅漲
-            decreasing_line_color='green' # 台股綠跌
+            name='Candlestick',
+            increasing_line_color='red',
+            decreasing_line_color='green'
         )])
 
-        # 加入 20 日均線
+        # Moving Average
         df['MA20'] = df['Close'].rolling(window=20).mean()
-        fig.add_trace(go.Scatter(x=df.index, y=df['MA20'], name='20日均線', line=dict(color='blue', width=1)))
+        fig.add_trace(go.Scatter(x=df.index, y=df['MA20'], name='MA20', line=dict(color='blue', width=1)))
 
         fig.update_layout(
-            title=f台積電歷史股價 ({start_date} 至 {end_date}),
-            yaxis_title=股價 (TWD),
-            xaxis_rangeslider_visible=True, # 下方時間縮放軸
-            template=plotly_white,
+            title=f"TSMC Stock Price ({start_date} to {end_date})",
+            yaxis_title="Price (TWD)",
+            xaxis_rangeslider_visible=True,
+            template="plotly_white",
             height=600
         )
 
-        # 4. 在網頁上顯示圖表與數據
+        # 4. Show Chart and Data
         st.plotly_chart(fig, use_container_width=True)
-        
-        st.subheader(數據預覽 (最近 5 筆))
+        st.subheader("Recent Data (Latest 5 Days)")
         st.dataframe(df.tail(5), use_container_width=True)
-    else
-        st.warning(在此日期範圍內找不到資料。)
+    else:
+        st.warning("No data found for the selected range.")
 
-
-st.info(提示：這是一個互動式圖表，你可以用滑鼠滾輪縮放，或移動滑鼠查看具體價位。)
-
+st.info("Tip: You can zoom and pan the chart with your mouse.")
