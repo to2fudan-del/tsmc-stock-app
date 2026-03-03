@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 # 設定網頁標題
 st.set_page_config(page_title=台積電股價分析儀表板, layout=wide)
 
-st.title(📈 台積電 (2330.TW) 股價即時畫布)
+st.title("台積電 (2330.TW) 股價即時畫布")
 st.sidebar.header(查詢參數設定)
 
 # 1. 讓使用者在側邊欄輸入日期
@@ -55,3 +55,4 @@ else
 
 
 st.info(提示：這是一個互動式圖表，你可以用滑鼠滾輪縮放，或移動滑鼠查看具體價位。)
+
